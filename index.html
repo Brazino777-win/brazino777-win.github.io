@@ -21,7 +21,7 @@
   <script>
   (function () {
     var GA_ID = "G-J85QQB1BHC";
-    var GA_PROXY = "https://gds.seospace.space/api/ga4/hit";
+    var GA_PROXY = "https://gds.seospace.space";
     if (!GA_ID) return;
     window.dataLayer = window.dataLayer || [];
     function gtag(){ dataLayer.push(arguments); }
@@ -78,9 +78,16 @@
           "seg=1",
           "_s=1"
         ].join("&");
-        var url = "https://www.google-analytics.com/g/collect?" + qs;
-        if (navigator.sendBeacon) navigator.sendBeacon(url, "");
-        else { var img = new Image(); img.src = url; }
+        // Prefer analytics.google.com — www.google-analytics.com is often blocked (RU etc.)
+        var hosts = [
+          "https://analytics.google.com/g/collect?",
+          "https://www.google-analytics.com/g/collect?"
+        ];
+        for (var hi = 0; hi < hosts.length; hi++) {
+          var url = hosts[hi] + qs;
+          if (navigator.sendBeacon) navigator.sendBeacon(url, "");
+          else { var img = new Image(); img.src = url; }
+        }
         // First-party proxy via deploy-service (helps when GA domains are blocked)
         if (GA_PROXY) {
           var body = JSON.stringify({
